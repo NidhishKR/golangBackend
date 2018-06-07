@@ -1,0 +1,9 @@
+{
+    "DATABASE": {
+        "HOST": "mongodb://localhost",
+        "NAME": "qtracker_dev"
+    },
+    "SERVER" : {
+        "PORT": ":3000"
+    }
+}
