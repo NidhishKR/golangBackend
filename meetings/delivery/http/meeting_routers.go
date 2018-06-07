@@ -11,4 +11,5 @@ func NewMeetingsHttpHandler(app *gin.Engine, mu meetingsUcase.MeetingsUsecase) {
 		MUsecase: mu,
 	}
 	app.GET("/meetingroom/region/:region", handler.GetByRegion)
+	app.POST("/meetingroom/add", handler.AddMeetingroom)
 }

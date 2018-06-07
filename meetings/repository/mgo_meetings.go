@@ -31,3 +31,23 @@ func (m *mgoMeetingsRepository) GetByRegion(ctx context.Context, region string) 
 	}
 	return &meetingRoom, nil
 }
+
+func (m *mgoMeetingsRepository) AddMeetingroom(ctx context.Context, mm *models.MeetingRoom) (bson.ObjectId, error) {
+	cn := config.CollectionNames(MEETINGROOM)
+	c := m.Conn.C(cn)
+	id := bson.NewObjectId()
+	mr := models.MeetingRoom{
+		Id : id,
+		Name:mm.Name,
+		Region :mm.Region,		
+		Building :mm.Building,
+		CreatedBy :mm.CreatedBy,
+		CreatedAt :mm.CreatedAt,
+	}
+	err := c.Insert(mr)
+
+	if err != nil {
+		return id, err
+	}
+	return id, nil
+}

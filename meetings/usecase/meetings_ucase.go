@@ -3,7 +3,8 @@ package usecase
 import (
 	"context"
 	"time"
-	
+	"gopkg.in/mgo.v2/bson"
+
 	"CleanArchMeetingRoom/models"
 	"CleanArchMeetingRoom/meetings"
 )
@@ -28,4 +29,14 @@ func (a *meetingUsecase) GetByRegion(c context.Context, region string) (*[]model
 		return nil, err
 	}
 	return res, nil
+}
+
+func (a *meetingUsecase) AddMeetingroom(c context.Context, m *models.MeetingRoom) (bson.ObjectId, error) {
+	ctx, cancel := context.WithTimeout(c, a.contextTimeout)
+	defer cancel()
+	id, err := a.meetingRepos.AddMeetingroom(ctx, m)
+	if err != nil {
+		return id, err
+	}
+	return id, nil
 }
