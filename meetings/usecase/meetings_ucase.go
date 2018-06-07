@@ -40,3 +40,13 @@ func (a *meetingUsecase) AddMeetingroom(c context.Context, m *models.MeetingRoom
 	}
 	return id, nil
 }
+
+func (a *meetingUsecase) AddMeeting(c context.Context, m *models.NewMeeting) (bson.ObjectId, error) {
+	ctx, cancel := context.WithTimeout(c, a.contextTimeout)
+	defer cancel()
+	id, err := a.meetingRepos.AddMeeting(ctx, m)
+	if err != nil {
+		return id, err
+	}
+	return id, nil
+}

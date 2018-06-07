@@ -8,5 +8,6 @@ import (
 
 type MeetingsRepository interface {
 	GetByRegion(ctx context.Context, id string) (*[]models.MeetingRoom, error)
-	AddMeetingroom(ctx context.Context, a *models.MeetingRoom) (bson.ObjectId, error)
+	AddMeetingroom(ctx context.Context, mr *models.MeetingRoom) (bson.ObjectId, error)
+	AddMeeting(ctx context.Context, m *models.NewMeeting) (bson.ObjectId, error)
 }

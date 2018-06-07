@@ -8,11 +8,11 @@ import (
 	meetingsRepo "CleanArchMeetingRoom/meetings/repository"
 	meetingsUcase "CleanArchMeetingRoom/meetings/usecase"
 	httpDeliver "CleanArchMeetingRoom/meetings/delivery/http"
-	utils "CleanArchMeetingRoom/utils"
-	middleware "CleanArchMeetingRoom/middleware"
-
 	userRepo "CleanArchMeetingRoom/user/repository"
 	userUcase "CleanArchMeetingRoom/user/usecase"
+
+	utils "CleanArchMeetingRoom/utils"
+	middleware "CleanArchMeetingRoom/middleware"
 
 )
 

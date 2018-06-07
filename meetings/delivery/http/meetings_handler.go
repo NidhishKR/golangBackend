@@ -6,7 +6,7 @@ import (
 
 	meetingsUcase "CleanArchMeetingRoom/meetings"
 	models "CleanArchMeetingRoom/models"
-	validator "gopkg.in/go-playground/validator.v9"
+	utils "CleanArchMeetingRoom/utils"
 )
 
 type HttpMeetingsHandler struct {
@@ -34,7 +34,7 @@ func (a *HttpMeetingsHandler) AddMeetingroom(c *gin.Context) {
 		c.JSON(http.StatusUnprocessableEntity, err.Error())
 	}
 
-	if ok, err := isRequestValid(&meetingRoom); !ok {
+	if ok, err := utils.IsValidMR(&meetingRoom); !ok {
 		c.JSON(http.StatusBadRequest, err.Error())
 	}
 
@@ -44,6 +44,26 @@ func (a *HttpMeetingsHandler) AddMeetingroom(c *gin.Context) {
 	}
 	
 	c.JSON(http.StatusCreated, mr)
+}
+
+func (a *HttpMeetingsHandler) AddMeeting(c *gin.Context) {
+	var meeting models.NewMeeting
+
+	err := c.Bind(&meeting)
+	if err != nil {
+		c.JSON(http.StatusUnprocessableEntity, err.Error())
+	}
+
+	if ok, err := utils.IsValidM(&meeting); !ok {
+		c.JSON(http.StatusBadRequest, err.Error())
+	}
+
+	m, err := a.MUsecase.AddMeeting(c, &meeting)
+	if err != nil {
+		c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
+	}
+	
+	c.JSON(http.StatusCreated, m)
 }
 
 func getStatusCode(err error) int {
@@ -60,15 +80,4 @@ func getStatusCode(err error) int {
 	default:
 		return http.StatusInternalServerError
 	}
-}
-
-func isRequestValid(m *models.MeetingRoom) (bool, error) {
-
-	validate := validator.New()
-
-	err := validate.Struct(m)
-	if err != nil {
-		return false, err
-	}
-	return true, nil
 }
