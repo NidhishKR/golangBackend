@@ -7,10 +7,7 @@ import (
 	
 	meeting "CleanArchMeetingRoom/meetings"
 	models "CleanArchMeetingRoom/models"
-	config "CleanArchMeetingRoom/config"
 )
-
-const MEETINGROOM string = "MEETINGROOM"
 
 type mgoMeetingsRepository struct {
 	Conn *mgo.Database
@@ -21,7 +18,7 @@ func NewMgoMeetingsRepository(Conn *mgo.Database) meeting.MeetingsRepository {
 }
 
 func (m *mgoMeetingsRepository) GetByRegion(ctx context.Context, region string) (*[]models.MeetingRoom, error) {
-	cn := config.CollectionNames(MEETINGROOM)
+	cn := models.MEETINGROOM.DB.MODELS.COLLECTION
 	c := m.Conn.C(cn)
 	var meetingRoom []models.MeetingRoom
 	iter := c.Find(bson.M{"region": region}).Limit(100).Iter()
@@ -33,7 +30,7 @@ func (m *mgoMeetingsRepository) GetByRegion(ctx context.Context, region string) 
 }
 
 func (m *mgoMeetingsRepository) AddMeetingroom(ctx context.Context, mmr *models.MeetingRoom) (bson.ObjectId, error) {
-	cn := config.CollectionNames(MEETINGROOM)
+	cn := models.MEETINGROOM.DB.MODELS.COLLECTION
 	c := m.Conn.C(cn)
 	id := bson.NewObjectId()
 	mr := models.MeetingRoom{
@@ -53,7 +50,7 @@ func (m *mgoMeetingsRepository) AddMeetingroom(ctx context.Context, mmr *models.
 }
 
 func (m *mgoMeetingsRepository) AddMeeting(ctx context.Context, mm *models.NewMeeting) (bson.ObjectId, error) {
-	cn := config.CollectionNames(MEETINGROOM)
+	cn := models.MEETINGROOM.DB.MODELS.COLLECTION
 	c := m.Conn.C(cn)
 	id := bson.NewObjectId()
 

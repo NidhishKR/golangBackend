@@ -7,10 +7,7 @@ import (
 
 	user "CleanArchMeetingRoom/user"
 	models "CleanArchMeetingRoom/models"
-	config "CleanArchMeetingRoom/config"
 )
-
-const USER string = "USER"
 
 type mgoUserRepository struct {
 	Conn *mgo.Database
@@ -21,7 +18,7 @@ func NewMgoUserRepository(Conn *mgo.Database) user.UserRepository {
 }
 
 func (m *mgoUserRepository) GetUserByAuthToken(ctx context.Context, token string) (bool, error) {
-	cn := config.CollectionNames(USER)
+	cn := models.USERS.DB.MODELS.COLLECTION
 	c := m.Conn.C(cn)
 	var user []models.User
 	iter := c.Find(bson.M{"accessTokens.token": token}).Limit(500).Iter()
