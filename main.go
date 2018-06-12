@@ -30,12 +30,14 @@ func main() {
 	dbName := viper.GetString(`DATABASE.NAME`)
 	port := viper.GetString(`SERVER.PORT`)
 
+	// InitLogger
+	utils.InitLogger()
+	// Init DB
 	initMongo(dbHost)
 	s := getSession()
 	dbConn := s.DB(dbName)
 	defer s.Close()
 	app := gin.New()
-	app.Use(gin.Logger())
 	timeoutContext := time.Duration(viper.GetInt("context.timeout")) * time.Second
 	ur := userRepo.NewMgoUserRepository(dbConn)
 	uu := userUcase.NewUserUsecase(ur, timeoutContext)
