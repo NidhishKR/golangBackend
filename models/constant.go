@@ -16,4 +16,5 @@ var (
 	MEETINGROOM = constent{DB: &Models{MODELS: &ModelsDetails{NAME: "MeetingRoom", COLLECTION: "meetingroom", STRUCT: "MeetingRoom"}}}
 	MEETING = constent{DB: &Models{MODELS: &ModelsDetails{NAME: "Meeting", COLLECTION: "meetingroom", STRUCT: "NewMeeting"}}}
 	USERS = constent{DB: &Models{MODELS: &ModelsDetails{NAME: "User", COLLECTION: "users", STRUCT: "User"}}}
+	GLOBALUSER = constent{DB: &Models{MODELS: &ModelsDetails{NAME: "GlobalUser", COLLECTION: "global_user", STRUCT: "GlobalUser"}}}
 )

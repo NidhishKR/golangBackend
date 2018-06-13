@@ -57,7 +57,9 @@ func (a *HttpMeetingsHandler) AddMeeting(c *gin.Context) {
 	if ok, err := utils.IsValidM(&meeting); !ok {
 		c.JSON(http.StatusBadRequest, err.Error())
 	}
-
+	if meeting.BookedBy == "" {
+		c.JSON(http.StatusBadRequest, models.NOT_FOUND_ERROR)
+	}	
 	m, err := a.MUsecase.AddMeeting(c, &meeting)
 	if err != nil {
 		c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})

@@ -4,9 +4,12 @@ import (
 	"context"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
+	"fmt"
+	"time"
 	
 	meeting "CleanArchMeetingRoom/meetings"
 	models "CleanArchMeetingRoom/models"
+
 )
 
 type mgoMeetingsRepository struct {
@@ -49,24 +52,31 @@ func (m *mgoMeetingsRepository) AddMeetingroom(ctx context.Context, mmr *models.
 	return id, nil
 }
 
-func (m *mgoMeetingsRepository) AddMeeting(ctx context.Context, mm *models.NewMeeting) (bson.ObjectId, error) {
+func (m *mgoMeetingsRepository) AddMeeting(ctx context.Context, mm *models.NewMeeting, u *models.GlobalUser) (string, error) {
 	cn := models.MEETINGROOM.DB.MODELS.COLLECTION
 	c := m.Conn.C(cn)
-	id := bson.NewObjectId()
-
+	id := fmt.Sprintf("%d", time.Now().UnixNano())
+	um := models.GlobalUser{
+		EmployeeName:  u.EmployeeName,
+		UserId:  u.UserId,
+		EmailId: u.EmailId,
+		ProfileImageUrl: u.ProfileImageUrl,
+	} 
 	nm := models.NewMeeting{
+		Id: id,
 		MeetingSubject : mm.MeetingSubject,
 		Meetingroom : mm.Meetingroom,		
 		MeetingStartTime : mm.MeetingStartTime,
 		MeetingEndTime : mm.MeetingEndTime,
 		MeetingDate : mm.MeetingDate,
 		BookedBy : mm.BookedBy,
+		UserDetails: &um,
 		MeetingStatus : mm.MeetingStatus,
 		MeetingReccurance : mm.MeetingReccurance,
 	}
-
-	err := c.Insert(nm)
-
+	Who := bson.M{"_id": bson.ObjectIdHex(mm.Meetingroom)}
+	PushToArray := bson.M{"$push": bson.M{"meetings": nm}}
+	err := c.Update(Who, PushToArray)
 	if err != nil {
 		return id, err
 	}

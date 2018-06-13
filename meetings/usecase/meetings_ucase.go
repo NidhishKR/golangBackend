@@ -7,16 +7,22 @@ import (
 
 	"CleanArchMeetingRoom/models"
 	"CleanArchMeetingRoom/meetings"
+	"CleanArchMeetingRoom/user"
+
+	// "fmt"
+
 )
 
 type meetingUsecase struct {
 	meetingRepos   meetings.MeetingsRepository
+	userRepos user.UserRepository
 	contextTimeout time.Duration
 }
 
-func NewMeetingUsecase(m meetings.MeetingsRepository, timeout time.Duration) meetings.MeetingsUsecase {
+func NewMeetingUsecase(m meetings.MeetingsRepository, u user.UserRepository, timeout time.Duration) meetings.MeetingsUsecase {
 	return &meetingUsecase{
 		meetingRepos:   m,
+		userRepos: u,
 		contextTimeout: timeout,
 	}
 }
@@ -41,12 +47,17 @@ func (a *meetingUsecase) AddMeetingroom(c context.Context, m *models.MeetingRoom
 	return id, nil
 }
 
-func (a *meetingUsecase) AddMeeting(c context.Context, m *models.NewMeeting) (bson.ObjectId, error) {
+func (a *meetingUsecase) AddMeeting(c context.Context, m *models.NewMeeting)  (*models.NewMeeting, error) {
 	ctx, cancel := context.WithTimeout(c, a.contextTimeout)
 	defer cancel()
-	id, err := a.meetingRepos.AddMeeting(ctx, m)
+	user, err := a.userRepos.GetUserByEmailId(c, m.BookedBy)
 	if err != nil {
-		return id, err
+		return nil, err
 	}
-	return id, nil
+	id, err := a.meetingRepos.AddMeeting(ctx, m, &user)
+	if err != nil {
+		return nil, err
+	}
+	m.Id = id
+	return m, nil
 }

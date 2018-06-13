@@ -7,6 +7,7 @@ import (
 
 	user "CleanArchMeetingRoom/user"
 	models "CleanArchMeetingRoom/models"
+	"fmt"
 )
 
 type mgoUserRepository struct {
@@ -24,9 +25,20 @@ func (m *mgoUserRepository) GetUserByAuthToken(ctx context.Context, token string
 	iter := c.Find(bson.M{"accessTokens.token": token}).Limit(500).Iter()
 	err := iter.All(&user)
 	if err != nil {
-		return  false, err
+		return  false, models.NOT_FOUND_ERROR
 	} else if len(user) == 0 {
 		return  false, models.NOT_FOUND_ERROR
 	}
 	return true, nil
+}
+
+func (m *mgoUserRepository) GetUserByEmailId(ctx context.Context, emailId string) (models.GlobalUser, error) {
+	cn := models.GLOBALUSER.DB.MODELS.COLLECTION
+	c := m.Conn.C(cn)
+	var user models.GlobalUser
+	err := c.Find(bson.M{"email": emailId}).One(&user)
+	if err != nil {
+		return models.GlobalUser{}, err
+	}
+	return user, nil
 }

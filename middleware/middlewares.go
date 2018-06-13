@@ -5,8 +5,6 @@ import (
     "net/http"
     
     userUcase "CleanArchMeetingRoom/user"
-    utils "CleanArchMeetingRoom/utils"
-    models "CleanArchMeetingRoom/models"
 
 )
 
@@ -40,13 +38,6 @@ func (a *goMiddleware) ValidateUser() gin.HandlerFunc {
             auth, err := a.UserUsecase.GetUserByAuthToken(c, token)
             c.Set("Authorization", auth)
             if err != nil {
-                l := models.Log{
-                    FileName: "middlewares.go",
-                    LineNumber: 42,
-                    Status: "error",
-                    // Msg: err,
-                }
-                utils.Logger(&l)
                 c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
                     "status":  "error",
                     "code":    "500",

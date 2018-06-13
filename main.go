@@ -31,7 +31,7 @@ func main() {
 	port := viper.GetString(`SERVER.PORT`)
 
 	// InitLogger
-	utils.InitLogger()
+	// utils.InitLogger()
 	// Init DB
 	initMongo(dbHost)
 	s := getSession()
@@ -47,7 +47,7 @@ func main() {
 	app.Use(middL.ValidateUser());
 
 	mr := meetingsRepo.NewMgoMeetingsRepository(dbConn)
-	mu := meetingsUcase.NewMeetingUsecase(mr, timeoutContext)
+	mu := meetingsUcase.NewMeetingUsecase(mr, ur, timeoutContext)
 	httpDeliver.NewMeetingsHttpHandler(app, mu)
 
 	app.Run(port)
