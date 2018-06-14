@@ -7,6 +7,8 @@ import (
 	
 	meeting "CleanArchMeetingRoom/meetings"
 	models "CleanArchMeetingRoom/models"
+
+	"fmt"
 )
 
 type mgoMeetingsRepository struct {
@@ -96,4 +98,32 @@ func (m *mgoMeetingsRepository) GetConcurrentMeetings(mm *models.NewMeeting) ([]
 		return []models.NewMeeting{}, err
 	}
 	return rs.Meetings, nil
+}
+
+func (m *mgoMeetingsRepository) GetMeetingsByDateRange(ctx context.Context, startDate string, endDate string,  id string) (bson.M, error) {
+	cn := models.MEETINGROOM.DB.MODELS.COLLECTION
+	c := m.Conn.C(cn)
+	// pipeline := []bson.M{
+	// 	{"$unwind": "$meetings"},
+	// 	{"$match": bson.M{"_id": bson.ObjectIdHex("5afd3cfa446ede8c9464803b"), "meetings.meetingDate": bson.M{"$gte":  "2019-07-01T18:30:34Z", "$lte": "2019-07-01T19:30:50Z"}}},
+	// 	{"$group": bson.M{"_id": "$_id",
+	// 	 "meetings": bson.M{"$addToSet": "$meetings"}},
+	// 	},
+	// }
+	pipeline := []bson.M{
+		{"$unwind": "$meetings"},
+		{"$match": bson.M{"_id": bson.ObjectIdHex(id), "meetings.meetingDate": bson.M{"$gte": startDate, "$lte": endDate}}},
+		{"$group": bson.M{"_id": "$_id",
+		 "meetings": bson.M{"$addToSet": "$meetings"}},
+		},
+	}
+	pipe := c.Pipe(pipeline)
+	result := bson.M{}
+	err := pipe.One(&result)
+	fmt.Println(startDate, "$$$$$$$$$$$4!!!!!!!!", err, endDate, id);
+	fmt.Println(result, "@@@@@");	
+	if err != nil {		
+		return bson.M{}, err
+	}
+	return result, nil
 }

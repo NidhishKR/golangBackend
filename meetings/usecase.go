@@ -10,4 +10,5 @@ type MeetingsUsecase interface {
 	GetByRegion(ctx context.Context, region string) (*[]model.MeetingRoom, error)
 	AddMeetingroom(context.Context, *model.MeetingRoom) (bson.ObjectId, error)
 	AddMeeting(context.Context, *model.NewMeeting)  (*model.NewMeeting, error)
+	GetMeetingsByDateRange(ctx context.Context, startDate string, endDate string,  id string) (bson.M, error)
 }

@@ -69,18 +69,22 @@ func (a *HttpMeetingsHandler) AddMeeting(c *gin.Context) {
 	c.JSON(http.StatusCreated, m)
 }
 
-func getStatusCode(err error) int {
-	if err == nil {
-		return http.StatusOK
+
+func (a *HttpMeetingsHandler) GetMeetingsByDateRange(c *gin.Context) {
+	startDate := c.Param("startDate")
+	endDate := c.Param("endDate")
+	meetingroomId := c.Param("meetingroom")
+    if (!utils.IsValidString(startDate) || !utils.IsValidString(endDate) || !utils.IsValidString(meetingroomId)) {
+		c.JSON(http.StatusNoContent, models.INVALID_INPUT)
 	}
-	switch err {
-	case models.INTERNAL_SERVER_ERROR:
-		return http.StatusInternalServerError
-	case models.NOT_FOUND_ERROR:
-		return http.StatusNotFound
-	case models.CONFLIT_ERROR:
-		return http.StatusConflict
-	default:
-		return http.StatusInternalServerError
+	m, err := a.MUsecase.GetMeetingsByDateRange(c, startDate, endDate, meetingroomId)
+	if err != nil && err.Error() == "not found" {
+		p := []models.NewMeeting{}
+		c.JSON(http.StatusOK, gin.H{
+				"status":  err.Error(),
+				"code":    "400",
+				"meetings": p,
+			})
 	}
+	c.JSON(http.StatusCreated, m)
 }

@@ -1,6 +1,6 @@
 {
     "DATABASE": {
-        "HOST": "mongodb://localhost",
+        "HOST": "mongodb://10.4.6.60",
         "NAME": "qtracker_dev"
     },
     "SERVER" : {

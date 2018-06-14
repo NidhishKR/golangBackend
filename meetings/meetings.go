@@ -11,4 +11,5 @@ type MeetingsRepository interface {
 	AddMeetingroom(ctx context.Context, mr *models.MeetingRoom) (bson.ObjectId, error)
 	AddMeeting(ctx context.Context, m *models.NewMeeting, u *models.GlobalUser) error
 	GetConcurrentMeetings(m *models.NewMeeting) ([]models.NewMeeting, error)
+	GetMeetingsByDateRange(ctx context.Context, startDate string, endDate string,  id string) (bson.M, error)
 }
