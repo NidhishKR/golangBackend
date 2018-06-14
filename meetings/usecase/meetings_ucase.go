@@ -4,12 +4,12 @@ import (
 	"context"
 	"time"
 	"gopkg.in/mgo.v2/bson"
+	"fmt"
 
 	"CleanArchMeetingRoom/models"
 	"CleanArchMeetingRoom/meetings"
 	"CleanArchMeetingRoom/user"
-
-	// "fmt"
+	"CleanArchMeetingRoom/utils"
 
 )
 
@@ -54,10 +54,28 @@ func (a *meetingUsecase) AddMeeting(c context.Context, m *models.NewMeeting)  (*
 	if err != nil {
 		return nil, err
 	}
-	id, err := a.meetingRepos.AddMeeting(ctx, m, &user)
+	vmd, err := utils.IsValidTime(m.MeetingDate)
+	vst, err := utils.IsValidTime(m.MeetingStartTime)
+	vet, err := utils.IsValidTime(m.MeetingEndTime) 
 	if err != nil {
-		return nil, err
+		return nil, models.INVALID_TIME_INPUT
 	}
-	m.Id = id
+	recurrence := models.ReccuranceCount{}
+	recurrence.Id = fmt.Sprintf("%d", time.Now().Unix())
+	recurrence.Repetition = m.MeetingReccurance
+	for n := 0; n <= m.MeetingReccurance; n++ {
+		m.Id = fmt.Sprintf("%d", time.Now().UnixNano())
+		m.MeetingStartTime = vst.Add(time.Hour * 24 * time.Duration(n)).Format(time.RFC3339)
+		m.MeetingEndTime = vet.Add(time.Hour * 24 * time.Duration(n)).Format(time.RFC3339)
+		m.MeetingDate = vmd.Add(time.Hour * 24 * time.Duration(n)).Format(time.RFC3339)
+		m.ReccuranceCount = recurrence
+		if existing, err := checkTiming(a, m, false); (existing && err !=nil) {
+			return nil, models.TIME_SLOT_BOOKED
+		}
+		res := a.meetingRepos.AddMeeting(ctx, m, &user)
+		if res != nil {
+			return nil, res
+		}
+	}
 	return m, nil
 }

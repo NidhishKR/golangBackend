@@ -5,7 +5,6 @@ import (
     "net/http"
     
     userUcase "CleanArchMeetingRoom/user"
-
 )
 
 type goMiddleware struct {

@@ -4,12 +4,9 @@ import (
 	"context"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
-	"fmt"
-	"time"
 	
 	meeting "CleanArchMeetingRoom/meetings"
 	models "CleanArchMeetingRoom/models"
-
 )
 
 type mgoMeetingsRepository struct {
@@ -52,10 +49,9 @@ func (m *mgoMeetingsRepository) AddMeetingroom(ctx context.Context, mmr *models.
 	return id, nil
 }
 
-func (m *mgoMeetingsRepository) AddMeeting(ctx context.Context, mm *models.NewMeeting, u *models.GlobalUser) (string, error) {
+func (m *mgoMeetingsRepository) AddMeeting(ctx context.Context, mm *models.NewMeeting, u *models.GlobalUser) error {
 	cn := models.MEETINGROOM.DB.MODELS.COLLECTION
 	c := m.Conn.C(cn)
-	id := fmt.Sprintf("%d", time.Now().UnixNano())
 	um := models.GlobalUser{
 		EmployeeName:  u.EmployeeName,
 		UserId:  u.UserId,
@@ -63,7 +59,7 @@ func (m *mgoMeetingsRepository) AddMeeting(ctx context.Context, mm *models.NewMe
 		ProfileImageUrl: u.ProfileImageUrl,
 	} 
 	nm := models.NewMeeting{
-		Id: id,
+		Id: mm.Id,
 		MeetingSubject : mm.MeetingSubject,
 		Meetingroom : mm.Meetingroom,		
 		MeetingStartTime : mm.MeetingStartTime,
@@ -78,7 +74,26 @@ func (m *mgoMeetingsRepository) AddMeeting(ctx context.Context, mm *models.NewMe
 	PushToArray := bson.M{"$push": bson.M{"meetings": nm}}
 	err := c.Update(Who, PushToArray)
 	if err != nil {
-		return id, err
+		return models.INTERNAL_SERVER_ERROR
 	}
-	return id, nil
+	return nil
+}
+
+func (m *mgoMeetingsRepository) GetConcurrentMeetings(mm *models.NewMeeting) ([]models.NewMeeting, error){
+	cn := models.MEETINGROOM.DB.MODELS.COLLECTION
+	c := m.Conn.C(cn)
+	pipeline := []bson.M{
+		{"$unwind": "$meetings"},
+		{"$match": bson.M{ "meetings.meetingroom" : mm.Meetingroom,"meetings.meetingDate" : mm.MeetingDate}},
+		{"$group": bson.M{"_id": "$_id",
+		 "meetings": bson.M{"$addToSet": "$meetings"}},
+		},
+	}
+	rs := models.MeetingRes{}
+	pipe := c.Pipe(pipeline)
+	err := pipe.One(&rs)
+	if(err != nil){
+		return []models.NewMeeting{}, err
+	}
+	return rs.Meetings, nil
 }

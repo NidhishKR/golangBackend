@@ -3,6 +3,7 @@ package utils
 import (
 	"os"
 	"strings"
+	"time"
 	validator "gopkg.in/go-playground/validator.v9"
 	models "CleanArchMeetingRoom/models"
 )
@@ -34,4 +35,19 @@ func IsValidM(m *models.NewMeeting) (bool, error) {
 		return false, err
 	}
 	return true, nil
+}
+
+func IsValidTime(t string) (time.Time, error) {
+	valid, err := time.Parse(time.RFC3339, t)
+	if err != nil {
+		return valid, err
+	}
+	return valid, nil
+}
+
+func IsValidString(s string) bool {
+	if s == "" {
+		return false
+	}
+	return true
 }

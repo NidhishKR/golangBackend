@@ -9,5 +9,6 @@ import (
 type MeetingsRepository interface {
 	GetByRegion(ctx context.Context, id string) (*[]models.MeetingRoom, error)
 	AddMeetingroom(ctx context.Context, mr *models.MeetingRoom) (bson.ObjectId, error)
-	AddMeeting(ctx context.Context, m *models.NewMeeting, u *models.GlobalUser) (string, error)
+	AddMeeting(ctx context.Context, m *models.NewMeeting, u *models.GlobalUser) error
+	GetConcurrentMeetings(m *models.NewMeeting) ([]models.NewMeeting, error)
 }

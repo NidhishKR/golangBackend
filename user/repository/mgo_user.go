@@ -7,7 +7,6 @@ import (
 
 	user "CleanArchMeetingRoom/user"
 	models "CleanArchMeetingRoom/models"
-	"fmt"
 )
 
 type mgoUserRepository struct {
