@@ -83,14 +83,14 @@ func (a *meetingUsecase) AddMeeting(c context.Context, m *models.NewMeeting)  (*
 func (a *meetingUsecase) GetMeetingsByDateRange(c context.Context, startDate string, endDate string,  id string) (bson.M, error) {
 	ctx, cancel := context.WithTimeout(c, a.contextTimeout)
 	defer cancel()
-	// vsd, err := utils.IsValidTime(startDate)
-	// ved, err := utils.IsValidTime(endDate)
-	// svsd := vsd.String()
-	// sved := ved.String()
-	// if err != nil {
-	// 	return nil, models.INVALID_TIME_INPUT
-	// }
-	res, err := a.meetingRepos.GetMeetingsByDateRange(ctx, startDate, endDate, id)
+	vsd, err := utils.IsValidTime(startDate)
+	ved, err := utils.IsValidTime(endDate)
+	svsd := vsd.String()
+	sved := ved.String()
+	if err != nil {
+		return nil, models.INVALID_TIME_INPUT
+	}
+	res, err := a.meetingRepos.GetMeetingsByDateRange(ctx, svsd, sved, id)
 	if err != nil {
 		return nil, err
 	}
