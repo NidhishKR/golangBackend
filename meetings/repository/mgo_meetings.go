@@ -69,6 +69,7 @@ func (m *mgoMeetingsRepository) AddMeeting(ctx context.Context, mm *models.NewMe
 		UserDetails: &um,
 		MeetingStatus : mm.MeetingStatus,
 		MeetingReccurance : mm.MeetingReccurance,
+		ReccuranceCount : mm.ReccuranceCount
 	}
 	Who := bson.M{"_id": bson.ObjectIdHex(mm.Meetingroom)}
 	PushToArray := bson.M{"$push": bson.M{"meetings": nm}}
